@@ -50,7 +50,7 @@ const { verifyToken } = require("../middleware/authMiddleware")
  *               desc_oz:
  *                 type: string
  *                 example: "Bu loyiha energiya sohasida amalga oshirilmoqda (lotin)."
- *               images:
+ *               media:
  *                 type: array
  *                 items:
  *                   type: string
@@ -61,14 +61,21 @@ const { verifyToken } = require("../middleware/authMiddleware")
  *       400:
  *         description: Xato yoki to‘ldirilmagan maydon
  */
-router.post("/", verifyToken, (req, res, next) => {
-  upload.array("images", 10) (req, res, (err) => {
-    if(err) {
-      return res.status(400).json({message: err.message})
-    }
-    next()
-  })
-} , create);
+
+// POST yaratish (mediaType nomi bilan fayllarni qabul qiladi)
+router.post(
+  "/",
+  verifyToken,
+  (req, res, next) => {
+    upload.array("media", 10)(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      next();
+    });
+  },
+  create
+);
 
 /**
  * @swagger
@@ -136,7 +143,7 @@ router.get("/:id", getById);
  *                 type: string
  *               desc_oz:
  *                 type: string
- *               images:
+ *               media:
  *                 type: array
  *                 items:
  *                   type: string
@@ -147,14 +154,17 @@ router.get("/:id", getById);
  *       404:
  *         description: Yangilik topilmadi
  */
-router.put("/:id", verifyToken, (req, res, next) => {
-  upload.array("images", 10) (req, res, (err) => {
-    if(err) {
-      return res.status(400).json({message: err.message})
-    }
-    next()
-  })
-}, update);
+router.put(
+  "/:id",
+  verifyToken,
+  (req, res, next) => {
+    upload.array("media", 10)(req, res, (err) => {
+      if (err) return res.status(400).json({ message: err.message });
+      next();
+    });
+  },
+  update
+);
 
 /**
  * @swagger

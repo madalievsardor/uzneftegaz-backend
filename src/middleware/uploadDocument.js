@@ -1,35 +1,10 @@
-// middleware/uploadDocument.js
+// middleware/uploadDocuments.js
 const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary"); // cloudinary config faylingiz
 const path = require("path");
-const fs = require("fs");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let folderPath;
-
-    if (req.baseUrl.includes("/xotinQizlar")) {
-      folderPath = path.join(__dirname, "../uploads/xotinQizlar");
-    } else if (req.baseUrl.includes("/yoshlarSiyosati")) {
-      folderPath = path.join(__dirname, "../uploads/yoshlarSiyosati");
-    } else if (req.baseUrl.includes("/normative")) {
-      folderPath = path.join(__dirname, "../uploads/files");
-    } else {
-      folderPath = path.join(__dirname, "../uploads/others");
-    }
-
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath, { recursive: true });
-      console.log("📁 Yangi papka yaratildi:", folderPath);
-    }
-
-    cb(null, folderPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
-    cb(null, uniqueName);
-  },
-});
-
+// 🔹 Ruxsat berilgan fayl turlari (faqat hujjatlar)
 const allowedTypes = [
   "application/pdf",
   "application/msword",
@@ -40,6 +15,7 @@ const allowedTypes = [
   "application/x-zip-compressed",
 ];
 
+// 🔹 Fayl turi tekshiruvi
 const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
@@ -53,10 +29,33 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// 🔹 CloudinaryStorage sozlamasi
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    let folderName = "documents/others";
+
+    // 🔸 URL bo‘yicha papka tanlash
+    if (req.baseUrl.includes("/xotinQizlar")) folderName = "documents/xotinQizlar";
+    else if (req.baseUrl.includes("/yoshlarSiyosati")) folderName = "documents/yoshlarSiyosati";
+    else if (req.baseUrl.includes("/normative")) folderName = "documents/normative";
+
+    return {
+      folder: folderName,
+      resource_type: "raw", // ⚠️ Muhim! Hujjatlar uchun 'raw' bo'lishi kerak
+      public_id: `${Date.now()}-${path.parse(file.originalname).name}`,
+      format: path.extname(file.originalname).substring(1), // fayl kengaytmasi
+      use_filename: true,
+      unique_filename: false,
+    };
+  },
+});
+
+// 🔹 Multer sozlamasi
 const uploadDocuments = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB limit
 });
 
 module.exports = uploadDocuments;

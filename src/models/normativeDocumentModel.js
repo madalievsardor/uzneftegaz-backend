@@ -7,23 +7,19 @@ const normativeDocumentSchema = new mongoose.Schema(
       ru: { type: String },
       oz: { type: String },
     },
-
     decree: {
       uz: { type: String, required: true },
       ru: { type: String },
       oz: { type: String },
     },
-
     description: {
       uz: { type: String, required: true },
       ru: { type: String },
       oz: { type: String },
     },
-
-    file: { type: String, required: true },
-
+    file: { type: String, required: true }, // Cloudinary URL
+    public_id: { type: String }, // 🔹 Cloudinary identifikatori
     fileType: { type: String },
-
     createdAt: { type: Date, default: Date.now },
   },
   { versionKey: false }

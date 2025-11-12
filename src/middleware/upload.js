@@ -1,7 +1,7 @@
-// middleware/upload.js
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
+const path = require("path"); // <-- kengaytmani olib tashlash uchun
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -17,15 +17,23 @@ const storage = new CloudinaryStorage({
     else if (req.baseUrl.includes("/leader")) folder = "leaders";
     else if (req.baseUrl.includes("/gender")) folder = "gender";
 
+    const resource_type = file.mimetype.startsWith("video/") ? "video" : "image";
+
+    // 🔹 Kengaytmani olib tashlaymiz — endi .mp4.mp4 bo‘lmaydi
+    const fileNameWithoutExt = path.parse(file.originalname).name.replace(/\s+/g, "_");
+
     return {
       folder,
       allowed_formats: ["jpg", "png", "jpeg", "webp", "gif", "mp4", "mov", "avi", "webm"],
-      resource_type: file.mimetype.startsWith("video/") ? "video" : "image",
-      public_id: `${Date.now()}-${file.originalname.replace(/\s+/g, "_")}`,
+      resource_type,
+      public_id: `${Date.now()}-${fileNameWithoutExt}`,
     };
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // Maks 50 MB
+});
 
 module.exports = upload;

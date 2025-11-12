@@ -12,11 +12,12 @@ const industryNewsModel = new mongoose.Schema(
       ru: { type: String },
       oz: { type: String },
     },
-    images: [
+    mediaType: [
       {
         url: { type: String, required: true },
-        public_id: { type: String, required: true }
-      }
+        public_id: { type: String, required: true },
+        type: { type: String, enum: ["image", "video"], required: true }, 
+      },
     ],
   },
   { timestamps: true }

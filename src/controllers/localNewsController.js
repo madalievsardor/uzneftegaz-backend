@@ -11,23 +11,23 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: "O'zbekcha title va description majburiy!" });
     }
 
-    let images = [];
+    let mediaType = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder: "localNews",
-          use_filename: true,
-          unique_filename: true,
+        mediaType.push({
+          url: file.path, // CloudinaryStorage to‘g‘ridan-to‘g‘ri secure_url beradi
+          public_id: file.filename, // CloudinaryStorage'dan public_id shu
+          type: file.mimetype.startsWith("video/") ? "video" : "image",
         });
-        images.push({ url: result.secure_url, public_id: result.public_id });
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
       }
+    } else {
+      return res.status(400).json({ message: "Rasm yoki video yuklash majburiy!" });
     }
 
     const news = new LocalNews({
       title: { uz: title_uz, ru: title_ru, oz: title_oz },
       description: { uz: desc_uz, ru: desc_ru, oz: desc_oz },
-      images,
+      mediaType,
     });
 
     await news.save();
@@ -50,18 +50,26 @@ exports.update = async (req, res) => {
     const news = await LocalNews.findById(id);
     if (!news) return res.status(404).json({ message: "Yangilik topilmadi!" });
 
-    let updatedImages = [...(news.images || [])];
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder: "localNews",
-          use_filename: true,
-          unique_filename: true,
-        });
-        updatedImages.push({ url: result.secure_url, public_id: result.public_id });
 
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    if (req.files && req.files.length > 0 && news.mediaType.length > 0) {
+      for (const media of news.mediaType) {
+        try {
+          await cloudinary.uploader.destroy(media.public_id, {
+            resource_type: media.type === "video" ? "video" : "image",
+          });
+        } catch (err) {
+          console.warn(`Eski faylni o'chirishda xatolik: ${media.public_id}`);
+        }
       }
+    }
+
+    let newMedia = news.mediaType;
+    if (req.files && req.files.length > 0) {
+      newMedia = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename,
+        type: file.mimetype.startsWith("video/") ? "video" : "image",
+      }));
     }
 
     news.title.uz = title_uz || news.title.uz;

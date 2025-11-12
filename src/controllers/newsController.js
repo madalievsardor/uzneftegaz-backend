@@ -8,28 +8,26 @@ exports.create = async (req, res) => {
     const { title_uz, title_ru, title_oz, desc_uz, desc_ru, desc_oz } = req.body;
 
     if (!title_uz || !desc_uz) {
-      return res.status(400).json({ message: "O‘zbekcha title va description majburiy!" });
+      return res.status(400).json({ message: "O'zbekcha title va description majburiy!" });
     }
 
-    let images = [];
+    let mediaType = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder: "news",
-          use_filename: true,
-          unique_filename: true,
+        mediaType.push({
+          url: file.path, // CloudinaryStorage to‘g‘ridan-to‘g‘ri secure_url beradi
+          public_id: file.filename, // CloudinaryStorage'dan public_id shu
+          type: file.mimetype.startsWith("video/") ? "video" : "image",
         });
-        images.push({ url: result.secure_url, public_id: result.public_id });
-
-        // Lokal faylni o'chirish
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
       }
+    } else {
+      return res.status(400).json({ message: "Rasm yoki video yuklash majburiy!" });
     }
 
     const news = new News({
       title: { uz: title_uz, ru: title_ru, oz: title_oz },
       description: { uz: desc_uz, ru: desc_ru, oz: desc_oz },
-      images,
+      mediaType,
     });
 
     await news.save();
@@ -40,32 +38,39 @@ exports.create = async (req, res) => {
   }
 };
 
-// 🟢 Yangilikni yangilash (Cloudinary)
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
     const { title_uz, title_ru, title_oz, desc_uz, desc_ru, desc_oz } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Noto‘g‘ri ID formati!" });
+      return res.status(400).json({ message: "Noto'g'ri ID formati!" });
     }
 
     const news = await News.findById(id);
-    if (!news) return res.status(404).json({ message: "Yangilik topilmadi!" });
+    if (!news) {
+      return res.status(404).json({ message: "Yangilik topilmadi!" });
+    }
 
-    // 🔹 Yangi fayllar Cloudinary'ga yuklash
-    let updatedImages = [...(news.images || [])];
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder: "news",
-          use_filename: true,
-          unique_filename: true,
-        });
-        updatedImages.push({ url: result.secure_url, public_id: result.public_id });
-
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    if (req.files && req.files.length > 0 && news.mediaType.length > 0) {
+      for (const media of news.mediaType) {
+        try {
+          await cloudinary.uploader.destroy(media.public_id, {
+            resource_type: media.type === "video" ? "video" : "image",
+          });
+        } catch (err) {
+          console.warn(`Eski faylni o'chirishda xatolik: ${media.public_id}`);
+        }
       }
+    }
+
+    let newMedia = news.mediaType;
+    if (req.files && req.files.length > 0) {
+      newMedia = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename, 
+        type: file.mimetype.startsWith("video/") ? "video" : "image",
+      }));
     }
 
     news.title.uz = title_uz || news.title.uz;
@@ -76,23 +81,29 @@ exports.update = async (req, res) => {
     news.description.ru = desc_ru || news.description.ru;
     news.description.oz = desc_oz || news.description.oz;
 
-    news.images = updatedImages;
+    news.mediaType = newMedia;
 
     await news.save();
-    res.status(200).json({ message: "Yangilik muvaffaqiyatli yangilandi", news });
+
+    res.status(200).json({
+      message: "Yangilik muvaffaqiyatli yangilandi",
+      news,
+    });
   } catch (error) {
     console.error("Xatolik:", error);
-    res.status(500).json({ message: "Serverda xatolik", error: error.message });
+    res.status(500).json({
+      message: "Serverda xatolik",
+      error: error.message,
+    });
   }
 };
 
-// 🟢 Yangilikni o'chirish (Cloudinary)
 exports.remove = async (req, res) => {
   try {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Noto‘g‘ri ID formati!" });
+      return res.status(400).json({ message: "Noto'g'ri ID formati!" });
     }
 
     const news = await News.findById(id);
@@ -105,14 +116,14 @@ exports.remove = async (req, res) => {
           try {
             await cloudinary.uploader.destroy(img.public_id);
           } catch (err) {
-            console.warn("Cloudinary rasmni o'chirishda xatolik:", err.message);
+            console.warn("Rasmni o'chirishda xatolik:", err.message);
           }
         }
       }
     }
 
     await News.findByIdAndDelete(id);
-    res.status(200).json({ message: "Yangilik muvaffaqiyatli o‘chirildi" });
+    res.status(200).json({ message: "Yangilik muvaffaqiyatli o'chirildi" });
   } catch (error) {
     console.error("Xatolik", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });
@@ -124,7 +135,7 @@ exports.getAll = async (req, res) => {
     const news = await News.find().sort({ createdAt: -1 });
     res.status(200).json({ message: "Barcha yangiliklar", news });
   } catch (error) {
-    console.error("❌ Xatolik (getAll):", error);
+    console.error("Xatolik", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
@@ -133,7 +144,7 @@ exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Noto‘g‘ri ID formati!" });
+      return res.status(400).json({ message: "Noto'g'ri ID formati!" });
     }
 
     const news = await News.findById(id);
@@ -141,7 +152,7 @@ exports.getById = async (req, res) => {
 
     res.status(200).json({ message: "Yangilik topildi", news });
   } catch (error) {
-    console.error("❌ Xatolik (getById):", error);
+    console.error("Xatolik", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
