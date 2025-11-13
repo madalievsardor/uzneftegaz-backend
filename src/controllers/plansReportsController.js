@@ -38,7 +38,7 @@ exports.create = async (req, res) => {
         })
       }
     }
-    if (participantsCount && isNan(participantsCount)) {
+    if (participantsCount && isNaN(participantsCount)) {
       return res.status(400).json({
         message: "Ishtirokchi soni raqam bo'lishi kerak"
       });
