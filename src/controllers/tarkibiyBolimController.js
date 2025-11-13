@@ -18,7 +18,7 @@ exports.create = async (req, res) => {
         });
 
         await bolim.save();
-        res.status(201).json({ message: "Bo‘lim muvaffaqiyatli yaratildi ✅", bolim });
+        res.status(201).json({ message: "Bo'lim muvaffaqiyatli yaratildi", bolim });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Serverda xatolik", error: e.message });
@@ -29,7 +29,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
     try {
         const bolimlar = await BolimModel.find().sort({ createdAt: -1 });
-        res.status(200).json({ message: "Barcha bo‘limlar", bolimlar });
+        res.status(200).json({ message: "Barcha bo'limlar", bolimlar });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Serverda xatolik", error: e.message });
@@ -42,13 +42,13 @@ exports.getById = async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "Noto‘g‘ri ID!" });
+            return res.status(400).json({ message: "Noto'g'ri ID!" });
         }
 
         const bolim = await BolimModel.findById(id);
-        if (!bolim) return res.status(404).json({ message: "Bo‘lim topilmadi" });
+        if (!bolim) return res.status(404).json({ message: "Bo'lim topilmadi" });
 
-        res.status(200).json({ message: "Bo‘lim topildi ✅", bolim });
+        res.status(200).json({ message: "Bo'lim topildi", bolim });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Serverda xatolik", error: e.message });
@@ -60,11 +60,11 @@ exports.update = async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "Noto‘g‘ri ID!" });
+            return res.status(400).json({ message: "Noto'g'ri ID!" });
         }
 
         const bolim = await BolimModel.findById(id);
-        if (!bolim) return res.status(404).json({ message: "Bo‘lim topilmadi" });
+        if (!bolim) return res.status(404).json({ message: "Bo'lim topilmadi" });
 
         const { title_uz, title_ru, title_oz, employees_uz, employees_ru, employees_oz, leader_uz, leader_ru, leader_oz, desc_uz, desc_ru, desc_oz } = req.body;
 
@@ -86,7 +86,7 @@ exports.update = async (req, res) => {
         bolim.description.oz = desc_oz || bolim.description.oz;
 
         await bolim.save();
-        res.status(200).json({ message: "Bo‘lim muvaffaqiyatli yangilandi ✅", bolim });
+        res.status(200).json({ message: "Bo'lim muvaffaqiyatli yangilandi", bolim });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Serverda xatolik", error: e.message });
@@ -98,14 +98,14 @@ exports.remove = async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "Noto‘g‘ri ID!" });
+            return res.status(400).json({ message: "Noto'g'ri ID!" });
         }
 
         const bolim = await BolimModel.findById(id);
-        if (!bolim) return res.status(404).json({ message: "Bo‘lim topilmadi" });
+        if (!bolim) return res.status(404).json({ message: "Bo'lim topilmadi" });
 
         await BolimModel.findByIdAndDelete(id);
-        res.status(200).json({ message: "Bo‘lim muvaffaqiyatli o‘chirildi ✅", bolim });
+        res.status(200).json({ message: "Bo'lim muvaffaqiyatli o'chirildi", bolim });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Serverda xatolik", error: e.message });

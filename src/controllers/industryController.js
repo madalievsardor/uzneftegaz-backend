@@ -1,7 +1,6 @@
 const IndustryNews = require("../models/industryNewsModel");
 const mongoose = require("mongoose");
 const cloudinary = require("../config/cloudinary");
-const fs = require("fs")
 exports.create = async (req, res) => {
   try {
     const { title_uz, title_ru, title_oz, desc_uz, desc_ru, desc_oz } = req.body;

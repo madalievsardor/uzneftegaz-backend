@@ -31,9 +31,6 @@ exports.create = async (req, res) => {
 
       avatarUrl = result.secure_url; 
       public_id = result.public_id;  // Fayl identifikatori
-
-      // Yuklangan lokal faylni o'chirish
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     }
 
     const newLeader = new leaderShipModel({
@@ -80,7 +77,7 @@ exports.update = async (req, res) => {
         try {
           await cloudinary.uploader.destroy(leader.avatarPublicId);
         } catch (err) {
-          console.warn("Cloudinary eski rasmni o'chirishda xatolik:", err.message);
+          console.warn("Eski rasimni o'chirishda xatolik:", err.message);
         }
       }
 
@@ -93,7 +90,6 @@ exports.update = async (req, res) => {
       leader.avatar = result.secure_url;
       leader.avatarPublicId = result.public_id;
 
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     }
 
     leader.fullName = { uz: fullName_uz || leader.fullName.uz, ru: fullName_ru || leader.fullName.ru, oz: fullName_oz || leader.fullName.oz };
@@ -133,7 +129,7 @@ exports.remove = async (req, res) => {
     }
 
     await leaderShipModel.findByIdAndDelete(id);
-    res.status(200).json({ message: "🗑️ Rahbar muvaffaqiyatli o'chirildi" });
+    res.status(200).json({ message: "Rahbar muvaffaqiyatli o'chirildi" });
 
   } catch (err) {
     console.error("O'chirish xatosi:", err);

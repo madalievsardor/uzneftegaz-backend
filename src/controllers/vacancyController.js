@@ -1,11 +1,9 @@
 const Vacancy = require("../models/vacancyModel");
 
-// CREATE
 exports.create = async (req, res) => {
   try {
     const { title, description, salary, requirements, deadline, salaryType } = req.body;
 
-    // Faqat uz maydonlarini tekshiramiz
     if (
       !title?.uz ||
       !description?.uz ||
@@ -92,7 +90,7 @@ exports.remove = async (req, res) => {
     if (!vacancy)
       return res.status(404).json({ message: "Vakansiya topilmadi" });
 
-    res.status(200).json({ message: "Vakansiya o‘chirildi" });
+    res.status(200).json({ message: "Vakansiya o'chirildi" });
   } catch (error) {
     res.status(500).json({ message: "Server xatosi", error: error.message });
   }

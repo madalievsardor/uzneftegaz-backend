@@ -116,7 +116,7 @@ exports.remove = async (req, res) => {
     await LocalNews.findByIdAndDelete(id);
     res.status(200).json({ message: "Yangilik muvaffaqiyatli o'chirildi" });
   } catch (error) {
-    console.error("Xatolik (remove):", error);
+    console.error("Xatolik", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
@@ -124,7 +124,7 @@ exports.remove = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const news = await LocalNews.find().sort({ createdAt: -1 });
-    res.status(200).json({ message: "Barcha local yangiliklar", news });
+    res.status(200).json({ message: "Barcha yangiliklar", news });
   } catch (error) {
     console.error("Xatolik:", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });

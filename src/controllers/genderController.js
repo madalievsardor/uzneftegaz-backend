@@ -33,18 +33,18 @@ exports.create = async (req, res) => {
     await newGender.save();
 
     res.status(201).json({
-      message: `${title_uz} muvaffaqiyatli yaratildi!`,
+      message: `Ma'lumot muvaffaqiyatli yaratildi!`,
       newGender,
     });
   } catch (e) {
-    console.error("Gender yaratishda xatolik:", e);
+    console.error("Serverda xatolik", e);
     res.status(500).json({ message: "Serverda xatolik", error: e.message });
   }
 };
 
 exports.getAll = async (req, res) => {
   try {
-    const gender = await genderSchema.find();
+    const gender = await genderSchema.find().sort({ createdAt: -1});
     res.status(200).json({ message: "Barcha ma'lumotlar", gender });
   } catch (e) {
     res.status(500).json({ message: "Serverda xatolik", error: e.message });

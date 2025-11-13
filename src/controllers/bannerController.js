@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose")
 const cloudinary = require("../config/cloudinary");
-// 🟢 Banner yaratish
+
 exports.create = async (req, res) => {
   console.log("reqFile", req.file);
 
@@ -18,7 +18,8 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: "Sarlavha (Uz) majburiy maydon" });
     }
 
-    const maxLength = 300;
+    const maxLength = 70;
+    const maxDescLength = 100
     if (
       title_uz.length > maxLength ||
       (title_ru && title_ru.length > maxLength) ||
@@ -28,8 +29,15 @@ exports.create = async (req, res) => {
         message: `Sarlavha uzunligi ${maxLength} belgidan oshmasligi kerak`,
       });
     }
+    if (
+      desc_uz.length > maxDescLength || desc_ru.length > maxDescLength || desc_oz > maxDescLength
+    ) {
+      return res.status(400).json({
+        message: `Tavsif uzunligi ${maxDescLength} belgidan oshmasligi kerak`
+      })
+    }
 
-    const mediaType = req.file.mimetype.startsWith("image") ? "image" : "video";
+      const mediaType = req.file.mimetype.startsWith("image") ? "image" : "video";
 
     const newBanner = new bannerModel({
       file: req.file.path,
@@ -57,9 +65,9 @@ exports.create = async (req, res) => {
     });
   } catch (e) {
     console.error("Banner yaratishda xato:", e);
-    res.status(500).json({ 
-      message: "Server xatosi", 
-      error: e.message 
+    res.status(500).json({
+      message: "Server xatosi",
+      error: e.message
     });
   }
 };
@@ -67,7 +75,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const banners = await bannerModel.find().sort({ createdAt: -1 });
-    res.status(200).json({message: "All users", banners});
+    res.status(200).json({ message: "All users", banners });
   } catch (e) {
     res.status(500).json({ message: "Server xatosi", error: e.message });
   }

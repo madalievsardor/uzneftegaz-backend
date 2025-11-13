@@ -62,7 +62,7 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const reports = await plansReportsModel.find();
+    const reports = await plansReportsModel.find().sort({ createdAt: -1});
     res.status(200).json({ message: "Barcha reja va hisbotlar", reports })
 
   } catch (e) {

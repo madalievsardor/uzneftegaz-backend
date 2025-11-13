@@ -71,7 +71,7 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const documents = await xotinQizlarModel.find();
+    const documents = await xotinQizlarModel.find().sort({ createdAt: -1 });
     res.status(200).json({ message: "Barcha hujjatlar", data: documents });
   } catch (e) {
     res.status(500).json({ message: "Serverda xatolik", error: e.message });

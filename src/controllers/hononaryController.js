@@ -15,7 +15,7 @@ exports.create = async (req, res) => {
 
     if (!fullName_uz || !specialist_uz || !grade_uz) {
       return res.status(400).json({
-        message: "UZ tilidagi maydonlar to'ldirilishi shart: fullName, specialist, grade"
+        message: "UZ tilidagi maydonlar to'ldirilishi shart"
       });
     }
 
@@ -123,8 +123,8 @@ exports.updateById = async (req, res) => {
     await officer.save();
     res.status(200).json({ message: "Xodim yangilandi", data: officer });
   } catch (error) {
-    console.error("Yangilash xatosi:", error);
-    res.status(500).json({ message: "Yangilashda xatolik yuz berdi", error: error.message });
+    console.error("Serverda xatolik:", error);
+    res.status(500).json({ message: "Serverda xatolik:", error: error.message });
   }
 };
 
@@ -145,17 +145,17 @@ exports.deleteById = async (req, res) => {
     await honoraryModel.findByIdAndDelete(id);
     res.status(200).json({ message: "Xodim o'chirildi" });
   } catch (error) {
-    console.error("O‘chirish xatosi:", error);
-    res.status(500).json({ message: "O'chirishda xatolik yuz berdi", error: error.message });
+    console.error("Serverda xatolik:", error);
+    res.status(500).json({ message: "Serverda xatolik:", error: error.message });
   }
 };
 
 exports.getAll = async (req, res) => {
   try {
     const allHonorary = await honoraryModel.find().sort({ createdAt: -1 });
-    res.status(200).json({ message: "Barcha faxriy xodimlar", data: allHonorary });
+    res.status(200).json({ message: "Barcha xodimlar", data: allHonorary });
   } catch (error) {
-    res.status(500).json({ message: "Ma'lumot olishda xatolik", error: error.message });
+    res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
 
@@ -170,7 +170,7 @@ exports.getById = async (req, res) => {
 
     res.status(200).json({ data: officer });
   } catch (error) {
-    res.status(500).json({ message: "Xatolik yuz berdi", error: error.message });
+    res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
 
