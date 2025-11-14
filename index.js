@@ -21,6 +21,8 @@ const plansReportsRoutes = require("./src/routes/plansReportsRoutes");
 const xotinQizlarRoutes = require("./src/routes/xotinQizlarRoutes");
 const yoshlarSiyosatiRoutes = require("./src/routes/yoshlarSiyosatiRoutes");
 const genderRoutes = require("./src/routes/genderRoutes");
+const hisobotRoutes= require("./src/routes/hisobotRoutes");
+const youthNews= require("./src/routes/youthNewsRoutes");
 const connectDB = require("./src/config/db");
 const { swaggerUi, swaggerSpec } = require("./src/config/swagger");
 
@@ -66,9 +68,11 @@ app.use("/api/news", newsRoutes);
 app.use("/api/localNews", localNewsRoutes);
 app.use("/api/industryNews", industryNewsRoutes);
 app.use("/api/plansReports", plansReportsRoutes);
-app.use("/api/xotinQizlar", xotinQizlarRoutes)
+app.use("/api/xotinQizlar", xotinQizlarRoutes);
 app.use("/api/yoshlarSiyosati", yoshlarSiyosatiRoutes);
-app.use("/api/gender", genderRoutes)
+app.use("/api/gender", genderRoutes);
+app.use("/api/hisobot", hisobotRoutes)
+app.use("/api/youthNews", youthNews)
 // Statik fayllar
 // Statik fayllar
 app.use("/uploads/banners", express.static(path.join(__dirname, "src", "uploads", "banners")));

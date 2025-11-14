@@ -1,4 +1,4 @@
-const LocalNews = require("../models/localNewsModel");
+const youthNews = require("../models/youthNewsModel");
 const mongoose = require("mongoose");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
@@ -24,7 +24,7 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: "Rasm yoki video yuklash majburiy!" });
     }
 
-    const news = new LocalNews({
+    const news = new youthNews({
       title: { uz: title_uz, ru: title_ru, oz: title_oz },
       description: { uz: desc_uz, ru: desc_ru, oz: desc_oz },
       mediaType,
@@ -33,7 +33,7 @@ exports.create = async (req, res) => {
     await news.save();
     res.status(201).json({ message: "Yangilik muvaffaqiyatli yaratildi", news });
   } catch (error) {
-    console.error("Xatolik:", error);
+    console.error("Xatolik ", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
@@ -47,9 +47,10 @@ exports.update = async (req, res) => {
       return res.status(400).json({ message: "Noto'g'ri ID formati!" });
     }
 
-    const news = await LocalNews.findById(id);
-    if (!news) return res.status(404).json({ message: "Yangilik topilmadi!" });
-
+    const news = await youthNews.findById(id);
+    if (!news) {
+      return res.status(404).json({ message: "Yangilik topilmadi!" });
+    }
 
     if (req.files && req.files.length > 0 && news.mediaType.length > 0) {
       for (const media of news.mediaType) {
@@ -67,7 +68,7 @@ exports.update = async (req, res) => {
     if (req.files && req.files.length > 0) {
       newMedia = req.files.map((file) => ({
         url: file.path,
-        public_id: file.filename,
+        public_id: file.filename, 
         type: file.mimetype.startsWith("video/") ? "video" : "image",
       }));
     }
@@ -83,10 +84,17 @@ exports.update = async (req, res) => {
     news.mediaType = newMedia;
 
     await news.save();
-    res.status(200).json({ message: "Yangilik muvaffaqiyatli yangilandi ", news });
+
+    res.status(200).json({
+      message: "Yangilik muvaffaqiyatli yangilandi",
+      news,
+    });
   } catch (error) {
     console.error("Xatolik:", error);
-    res.status(500).json({ message: "Serverda xatolik", error: error.message });
+    res.status(500).json({
+      message: "Serverda xatolik",
+      error: error.message,
+    });
   }
 };
 
@@ -98,22 +106,23 @@ exports.remove = async (req, res) => {
       return res.status(400).json({ message: "Noto'g'ri ID formati!" });
     }
 
-    const news = await LocalNews.findById(id);
+    const news = await youthNews.findById(id);
     if (!news) return res.status(404).json({ message: "Yangilik topilmadi!" });
 
+    // 🔹 Cloudinary'dan rasmlarni o'chirish
     if (news.images && news.images.length > 0) {
       for (const img of news.images) {
         if (img.public_id) {
           try {
             await cloudinary.uploader.destroy(img.public_id);
           } catch (err) {
-            console.warn("Cloudinary rasmni o'chirishda xatolik:", err.message);
+            console.warn("Rasmni o'chirishda xatolik:", err.message);
           }
         }
       }
     }
 
-    await LocalNews.findByIdAndDelete(id);
+    await youthNews.findByIdAndDelete(id);
     res.status(200).json({ message: "Yangilik muvaffaqiyatli o'chirildi" });
   } catch (error) {
     console.error("Xatolik", error);
@@ -123,10 +132,10 @@ exports.remove = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const news = await LocalNews.find().sort({ createdAt: -1 });
+    const news = await youthNews.find().sort({ createdAt: -1 });
     res.status(200).json({ message: "Barcha yangiliklar", news });
   } catch (error) {
-    console.error("Xatolik:", error);
+    console.error("Xatolik", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
@@ -134,17 +143,17 @@ exports.getAll = async (req, res) => {
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Noto'g'ri ID formati!" });
     }
 
-    const news = await LocalNews.findById(id);
+    const news = await youthNews.findById(id);
     if (!news) return res.status(404).json({ message: "Yangilik topilmadi!" });
 
     res.status(200).json({ message: "Yangilik topildi", news });
   } catch (error) {
-    console.error("Xatolik:", error);
+    console.error("Xatolik", error);
     res.status(500).json({ message: "Serverda xatolik", error: error.message });
   }
 };
+

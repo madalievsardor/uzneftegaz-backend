@@ -34,11 +34,16 @@ const storage = new CloudinaryStorage({
     else if (req.baseUrl.includes("/honorary")) folder = "honorary";
     else if (req.baseUrl.includes("/leader")) folder = "leaders";
     else if (req.baseUrl.includes("/gender")) folder = "gender";
+    else if (req.baseUrl.includes("/youthNews")) folder = "youthNews";
 
     const resource_type = file.mimetype.startsWith("video/") ? "video" : "image";
 
     // 🔹 Fayl nomini kengaytmasiz va bo‘shliqsiz qilib olamiz
-    const fileNameWithoutExt = path.parse(file.originalname).name.replace(/\s+/g, "_");
+        const fileNameWithoutExt = path
+      .parse(file.originalname)
+      .name
+      .replace(/\s+/g, "_")       // probel → _
+      .replace(/[^\w\-]+/g, "");
 
     return {
       folder,
