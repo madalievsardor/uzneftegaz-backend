@@ -30,13 +30,24 @@ exports.create = async (req, res) => {
       if (!description_uz) missingFields.push("description_uz");
       return res.status(400).json({ message: `Quyidagi maydonlar to'ldirilmagan ${missingFields.join(", ")}`, missingFields })
     }
-    if (category_uz) {
-      const allowedCategories = ["Режа", "Хисобот"];
-      if (!allowedCategories.includes(category_uz)) {
-        return res.status(400).json({
-          message: "Noto'g'ri category_uz faqat 'Режа' yoki Хисобот kiritish mumkun "
-        })
-      }
+    const allowedUz = ["Режа", "Хисобот"];
+    const allowedOz = ["Reja", "Xisobot"];
+    const allowedRu = ["План", "Отчет"];
+
+    if (!allowedUz.includes(category_uz)) {
+      return res.status(400).json({
+        message: "category_uz faqat 'Режа' yoki 'Хисобот' bo'lishi kerak"
+      });
+    }
+    if (category_oz && !allowedOz.includes(category_oz)) {
+      return res.status(400).json({
+        message: "category_oz faqat 'Reja' yoki 'Xisobot' bo'lishi kerak"
+      });
+    }
+    if (category_ru && !allowedRu.includes(category_ru)) {
+      return res.status(400).json({
+        message: "category_ru faqat 'План' yoki 'Отчет' bo'lishi kerak"
+      });
     }
     if (participantsCount && isNaN(participantsCount)) {
       return res.status(400).json({
@@ -99,13 +110,24 @@ exports.update = async (req, res) => {
       participantsCount
     } = req.body;
 
-    if (category_uz) {
-      const allowedCategories = ["Режа", "Хисобот"]
-      if (!allowedCategories.includes(category_uz)) {
-        return res.status(400).json({
-          message: "Noto'g'ri category_uz! faqat 'Режа', 'Хисобот'  kiritish mumkun",
-        })
-      }
+    const allowedUz = ["Режа", "Хисобот"];
+    const allowedOz = ["Reja", "Xisobot"];
+    const allowedRu = ["План", "Отчет"];
+
+    if (!allowedUz.includes(category_uz)) {
+      return res.status(400).json({
+        message: "category_uz faqat 'Режа' yoki 'Хисобот' bo'lishi kerak"
+      });
+    }
+    if (category_oz && !allowedOz.includes(category_oz)) {
+      return res.status(400).json({
+        message: "category_oz faqat 'Reja' yoki 'Xisobot' bo'lishi kerak"
+      });
+    }
+    if (category_ru && !allowedRu.includes(category_ru)) {
+      return res.status(400).json({
+        message: "category_ru faqat 'План' yoki 'Отчет' bo'lishi kerak"
+      });
     }
 
     if (participantsCount !== undefined) {

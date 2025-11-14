@@ -34,9 +34,13 @@ const plansReportsSchema = new mongoose.Schema(
       },
       ru: {
         type: String,
+        required: true,
+        enum: ["План", "Отчет"]
       },
       oz: {
         type: String,
+        required: true,
+        enum: ["Reja", "Xisobot"]
       },
     },
     title: {
