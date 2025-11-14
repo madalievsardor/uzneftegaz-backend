@@ -62,7 +62,7 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const reports = await plansReportsModel.find().sort({ createdAt: -1});
+    const reports = await plansReportsModel.find().sort({ createdAt: -1 });
     res.status(200).json({ message: "Barcha reja va hisbotlar", reports })
 
   } catch (e) {
@@ -108,11 +108,14 @@ exports.update = async (req, res) => {
       }
     }
 
-    if (participantsCount || isNaN(participantsCount)) {
-      return res.status(400).json({
-        message: "Ishtirokchi soni raqam bo'lishi kerak"
-      })
-    };
+    if (participantsCount !== undefined) {
+      if (isNaN(Number(participantsCount))) {
+        return res.status(400).json({
+          message: "Ishtirokchi soni faqat raqam bo'lishi kerak!"
+        });
+      }
+      report.participantsCount = Number(participantsCount);
+    }
 
     if (startMonth_oz || startMonth_uz || startMonth_ru) {
       report.startMonth = {
@@ -148,29 +151,29 @@ exports.update = async (req, res) => {
         oz: description_oz ?? report.description.oz,
         ru: description_ru ?? report.description.ru,
       };
-      if(participantsCount !== undefined) {
-        report.participantsCount = participantsCount
-      }
+    if (participantsCount !== undefined) {
+      report.participantsCount = participantsCount
+    }
 
-      await report.save();
-      res.status(200).json({message: `${report.category.oz} bo'yicha ma'lumot muvaffaqiyatli yangilandi!`, report})
+    await report.save();
+    res.status(200).json({ message: `${report.category.oz} bo'yicha ma'lumot muvaffaqiyatli yangilandi!`, report })
   } catch (e) {
     return res.status(500).json({ message: "Serverda xatolik", error: e.message })
   }
 }
 
 exports.remove = async (req, res) => {
-  try{
-    const {id} = req.params;
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({message: "Noto'g'ri ID format"})
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Noto'g'ri ID format" })
     }
     const report = await plansReportsModel.findByIdAndUpdate(id);
-    if(!report) {
-      return res.status(404).json({message: "Ma'lumot topilmadi!"})
+    if (!report) {
+      return res.status(404).json({ message: "Ma'lumot topilmadi!" })
     }
-    res.status(200).json({message: `${report.category.oz} muvaffaqiyatli o'chirildi.`})
-  } catch(e) {
-    res.status(500).json({message: "Serverda xatolik", error: e.message})
+    res.status(200).json({ message: `${report.category.oz} muvaffaqiyatli o'chirildi.` })
+  } catch (e) {
+    res.status(500).json({ message: "Serverda xatolik", error: e.message })
   }
 }
