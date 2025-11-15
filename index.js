@@ -21,8 +21,9 @@ const plansReportsRoutes = require("./src/routes/plansReportsRoutes");
 const xotinQizlarRoutes = require("./src/routes/xotinQizlarRoutes");
 const yoshlarSiyosatiRoutes = require("./src/routes/yoshlarSiyosatiRoutes");
 const genderRoutes = require("./src/routes/genderRoutes");
-const hisobotRoutes= require("./src/routes/hisobotRoutes");
-const youthNews= require("./src/routes/youthNewsRoutes");
+const hisobotRoutes = require("./src/routes/hisobotRoutes");
+const youthNews = require("./src/routes/youthNewsRoutes");
+const sportRoutes = require("./src/routes/sportRoutes")
 const connectDB = require("./src/config/db");
 const { swaggerUi, swaggerSpec } = require("./src/config/swagger");
 
@@ -71,8 +72,9 @@ app.use("/api/plansReports", plansReportsRoutes);
 app.use("/api/xotinQizlar", xotinQizlarRoutes);
 app.use("/api/yoshlarSiyosati", yoshlarSiyosatiRoutes);
 app.use("/api/gender", genderRoutes);
-app.use("/api/hisobot", hisobotRoutes)
-app.use("/api/youthNews", youthNews)
+app.use("/api/hisobot", hisobotRoutes);
+app.use("/api/youthNews", youthNews);
+app.use("/api/sport", sportRoutes)
 // Statik fayllar
 // Statik fayllar
 app.use("/uploads/banners", express.static(path.join(__dirname, "src", "uploads", "banners")));
@@ -94,7 +96,7 @@ app.get("/", (req, res) => {
 });
 
 // Port
-app.listen(PORT,  "0.0.0.0", () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`📘 Swagger docs: http://localhost:${PORT}/api-docs`);
 });
