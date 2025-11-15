@@ -3,7 +3,6 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 const path = require("path");
 
-// ✅ Ruxsat etilgan MIME turlar
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
@@ -16,11 +15,9 @@ const ALLOWED_MIME_TYPES = [
   "video/webm",
 ];
 
-// 🔹 Cloudinary Storage sozlamasi
 const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-    // 🔸 Fayl turi ruxsat etilganini tekshiramiz
     if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
       throw new Error("Faqat rasm yoki video yuklash mumkin!");
     }
@@ -36,34 +33,33 @@ const storage = new CloudinaryStorage({
     else if (req.baseUrl.includes("/gender")) folder = "gender";
     else if (req.baseUrl.includes("/youthNews")) folder = "youthNews";
 
-    const resource_type = file.mimetype.startsWith("video/") ? "video" : "image";
-
-    // 🔹 Fayl nomini kengaytmasiz va bo‘shliqsiz qilib olamiz
-        const fileNameWithoutExt = path
+    const fileNameWithoutExt = path
       .parse(file.originalname)
-      .name
-      .replace(/\s+/g, "_")       // probel → _
+      .name.replace(/\s+/g, "_")
       .replace(/[^\w\-]+/g, "");
+
+    const isVideo = file.mimetype.startsWith("video/");
 
     return {
       folder,
-      allowed_formats: ["jpg", "png", "jpeg", "webp", "gif", "mp4", "mov", "avi", "webm"],
-      resource_type,
+      resource_type: isVideo ? "video" : "image",
       public_id: `${Date.now()}-${fileNameWithoutExt}`,
+      allowed_formats: ["jpg", "png", "jpeg", "webp", "gif", "mp4"],
+      
+      // 📌 ***iPhone bilan 100% mos video transformatsiya***
+      transformation: isVideo
+        ? [{ format: "mp4", video_codec: "h264" }]
+        : [],
     };
   },
 });
 
-// 🔹 Multer konfiguratsiyasi
 const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 }, // Maks 50 MB
+  limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Faqat rasm (jpg, png, webp) yoki video (mp4, mov, webm) yuklash mumkin!"));
-    }
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) cb(null, true);
+    else cb(new Error("Faqat rasm yoki video yuklash mumkin!"));
   },
 });
 
