@@ -252,7 +252,7 @@ exports.remove = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Noto'g'ri ID format" })
     }
-    const report = await Hisobot.findByIdAndUpdate(id);
+    const report = await Hisobot.findByIdAndDelete(id);
     if (!report) {
       return res.status(404).json({ message: "Ma'lumot topilmadi!" })
     }
