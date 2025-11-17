@@ -212,7 +212,7 @@ exports.update = async (req, res) => {
       };
     }
     if (plan_uz || plan_oz || plan_ru)
-      report.category = {
+      report.plan = {
         uz: plan_uz ?? report.plan.uz,
         oz: plan_oz ?? report.plan.oz,
         ru: plan_ru ?? report.plan.ru,
