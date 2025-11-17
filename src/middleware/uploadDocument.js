@@ -39,6 +39,7 @@ const storage = new CloudinaryStorage({
     if (req.baseUrl.includes("/xotinQizlar")) folderName = "documents/xotinQizlar";
     else if (req.baseUrl.includes("/yoshlarSiyosati")) folderName = "documents/yoshlarSiyosati";
     else if (req.baseUrl.includes("/normative")) folderName = "documents/normative";
+    else if (req.baseUrl.includes("/kasabaDocuments")) folderName = "documents/kasabaDocuments";
 
     return {
       folder: folderName,

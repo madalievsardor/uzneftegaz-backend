@@ -1,0 +1,28 @@
+const mongoose = require("mongoose");
+
+const kasabaDocumentSchema = new mongoose.Schema(
+    {
+        title: {
+            uz: { type: String, required: true },
+            ru: { type: String },
+            oz: { type: String }
+        },
+        decree: {
+            uz: { type: String, required: true },
+            ru: { type: String },
+            oz: { type: String }
+        },
+        description: {
+            uz: { type: String, required: true },
+            ru: { type: String },
+            oz: { type: String }
+        },
+        file: { type: String, required: true },
+        public_id: {type: String},
+        fileType: { type: String},
+        createdAt: { type: Date, default: Date.now}
+    },
+    { versionKey: false}
+)
+
+module.exports = mongoose.model("NefteGazKasabaDocument", kasabaDocumentSchema)

@@ -9,37 +9,7 @@ const upload = require("../middleware/upload"); // Agar rasm yuklash middleware 
  *   description: NefteGaz jamoa (xodimlar) API
  */
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Team:
- *       type: object
- *       properties:
- *         _id: { type: string }
- *         name:
- *           type: object
- *           properties:
- *             uz: { type: string }
- *             ru: { type: string }
- *             oz: { type: string }
- *         grade:
- *           type: object
- *           properties:
- *             uz: { type: string }
- *             ru: { type: string }
- *             oz: { type: string }
- *         phone: { type: string }
- *         email: { type: string }
- *         avatar: { type: string }
- *         avatar_public_id: { type: string }
- *         createdAt: { type: string }
- *         updatedAt: { type: string }
- */
 
-//
-// 🟢 CREATE
-//
 /**
  * @swagger
  * /team:

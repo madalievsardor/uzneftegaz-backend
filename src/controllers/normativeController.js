@@ -18,7 +18,7 @@ exports.create = async (req, res) => {
 
     if (!req.file) {
       return res.status(400).json({ message: "Fayl yuklanmagan!" });
-    }
+    }                                                       
 
     const missingFields = [];
     if(!title_uz?.trim()) missingFields.push("title_uz");
@@ -60,7 +60,7 @@ exports.create = async (req, res) => {
     await newDocument.save();
 
     res.status(201).json({
-      message: "Normativ hujjat muvaffaqiyatli yaratildi!",
+      message: "Ma'lumot muvaffaqiyatli yaratildi!",
       data: newDocument,
     });
   } catch (error) {
@@ -158,7 +158,7 @@ exports.remove = async (req, res) => {
           resource_type: "raw",
         });
       } catch (err) {
-        console.warn("Cloudinary faylni o'chirishda xatolik:", err.message);
+        console.warn("Faylni o'chirishda xatolik:", err.message);
       }
     }
 

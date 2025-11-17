@@ -86,11 +86,14 @@ const normativeDocumentController = require("../controllers/normativeController"
  *       500:
  *         description: Serverda xatolik
  */
-router.post(
-  "/create", verifyToken,
-  upload.single("file"),
-  normativeDocumentController.create
-);
+router.post("/create", verifyToken, (req, res, next) => {
+  upload.single("file") (req, res, (err) => {
+    if(err) {
+      return res.status(400).json({message: err.message})
+    }
+    next()
+  })
+}, normativeDocumentController.create);
 
 
 /**
@@ -191,10 +194,14 @@ router.get("/:id", normativeDocumentController.getById);
  *         description: Server xatosi
  */
 router.put(
-  "/update/:id", verifyToken,
-  upload.single("file"),
-  normativeDocumentController.update
-);
+  "/update/:id", verifyToken, (req, res, next) => {
+  upload.single("file") (req, res, (err) => {
+    if(err) {
+      return res.status(400).json({message: err.message})
+    }
+    next()
+  })
+}, normativeDocumentController.create);
 
 /**
  * @swagger
