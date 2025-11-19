@@ -152,6 +152,6 @@ router.put("/update/:id", verifyToken, (req, res, next) => {
  *       200:
  *         description: O‘chirildi
  */
-router.delete("/delete/:id", kasabaController.remove);
+router.delete("/delete/:id", verifyToken, kasabaController.remove);
 
 module.exports = router;

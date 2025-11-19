@@ -173,6 +173,6 @@ router.put("/:id", verifyToken, (req, res, next) => {
  *       404:
  *         description: Ma'lumot topilmadi
  */
-router.delete("/:id", remove);
+router.delete("/:id", verifyToken, remove);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const team = require("../controllers/teamController");
+const { verifyToken } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload"); // Agar rasm yuklash middleware bo‘lsa
 
 /**
@@ -43,7 +44,15 @@ const upload = require("../middleware/upload"); // Agar rasm yuklash middleware 
  *       201: { description: Ma'lumot yaratildi }
  *       400: { description: Xato yoki majburiy maydon kiritilmagan }
  */
-router.post("/", upload.single("avatar"), team.create);
+// router.post("/", upload.single("avatar"), team.create);
+router.post("/", verifyToken, (req, res, next) => {
+    upload.single("avatar") (req, res, (err) => {
+        if(err) {
+            return res.status(400).json({message: err.message})
+        }
+        next()
+    })
+}, team.create)
 
 
 //
@@ -100,8 +109,15 @@ router.get("/", team.getAll);
  *       200: { description: Ma'lumot yangilandi }
  *       404: { description: Xodim topilmadi }
  */
-router.put("/:id", upload.single("avatar"), team.update);
-
+// router.put("/:id", upload.single("avatar"), team.update);
+router.put("/:id", verifyToken, (req, res, next) => {
+    upload.single("avatar")(req, res, (err) => {
+        if(err) {
+            return res.status(400).json({message: err.message})
+        }
+        next();
+    });
+}, team.update)
 
 //
 // 🔴 DELETE
@@ -123,6 +139,6 @@ router.put("/:id", upload.single("avatar"), team.update);
  *       200: { description: O'chirildi }
  *       404: { description: Topilmadi }
  */
-router.delete("/:id", team.remove);
+router.delete("/:id", verifyToken, team.remove);
 
 module.exports = router;

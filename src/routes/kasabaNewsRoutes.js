@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/upload"); // multer (images/videos)
 const kasabaNewsController = require("../controllers/kasabaNewsController");
-
+const { verifyToken } = require("../middleware/authMiddleware")
 /**
  * @swagger
  * tags:
@@ -47,8 +47,16 @@ const kasabaNewsController = require("../controllers/kasabaNewsController");
  *       201:
  *         description: Yangilik yaratildi
  */
-router.post("/create", upload.array("files", 10), kasabaNewsController.create);
-
+router.post("/create", verifyToken, (req, res, next) => {
+    upload.array("files", 10) (req, res, (err) => {
+        if(err) {
+            return res.status(400).json({message: err.message})
+        }
+        next();
+    });
+},
+ kasabaNewsController.create
+)
 
 
 /**
@@ -106,8 +114,14 @@ router.get("/", kasabaNewsController.getAll);
  *       200:
  *         description: Yangilandi
  */
-router.put("/:id", upload.array("files", 10), kasabaNewsController.update);
-
+router.put("/:id", verifyToken, (req, res, next) => {
+    upload.array("files", 10) (req, res, (err) => {
+        if(err) {
+            return res.status(400).json({message: err.message});
+        };
+        next()
+    });
+}, kasabaNewsController.update)
 
 
 /**
@@ -126,6 +140,6 @@ router.put("/:id", upload.array("files", 10), kasabaNewsController.update);
  *       200:
  *         description: Yangilik o‘chirildi
  */
-router.delete("/:id", kasabaNewsController.remove);
+router.delete("/:id", verifyToken, kasabaNewsController.remove);
 
 module.exports = router;

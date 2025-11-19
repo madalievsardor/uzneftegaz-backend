@@ -64,8 +64,7 @@ const {
  *       500: { description: Serverda xatolik }
  */
 router.post("/create", verifyToken,  (req, res, next) => {
-  upload.array("file")(req, res, (err) => {
-    console.log("req.file", req.file)
+  upload.array("files")(req, res, (err) => {
     if(err) return res.status(400).json({message: "File da error", error: err.message });
     next(); // create controller chaqiriladi
   });
@@ -130,8 +129,7 @@ router.get("/all", getAll);
  *       500: { description: Server xatosi }
  */
 router.put("/:id", verifyToken,  (req, res, next) => {
-  upload.array("file")(req, res, (err) => {
-    console.log("req.file", req.file)
+  upload.array("files")(req, res, (err) => {
     if(err) return res.status(400).json({message: "File da error", error: err.message });
     next(); // create controller chaqiriladi
   });
