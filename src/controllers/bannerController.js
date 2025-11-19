@@ -18,8 +18,8 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: "Sarlavha (Uz) majburiy maydon" });
     }
 
-    const maxLength = 70;
-    const maxDescLength = 100
+    const maxLength = 200;
+    const maxDescLength = 350
     if (
       title_uz.length > maxLength ||
       (title_ru && title_ru.length > maxLength) ||

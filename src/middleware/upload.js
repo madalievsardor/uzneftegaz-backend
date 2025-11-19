@@ -35,6 +35,7 @@ const storage = new CloudinaryStorage({
     else if (req.baseUrl.includes("/team")) folder = "team"
     else if (req.baseUrl.includes("/kasabaDocuments")) folder = "kasabaDocuments"
     else if (req.baseUrl.includes("/kasabaNews")) folder = "kasabaNews"
+    else if (req.baseUrl.includes("/tadbirlar")) folder = "tadbirlar"
 
     const fileNameWithoutExt = path
       .parse(file.originalname)
@@ -59,7 +60,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 150 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (ALLOWED_MIME_TYPES.includes(file.mimetype)) cb(null, true);
     else cb(new Error("Faqat rasm yoki video yuklash mumkin!"));
