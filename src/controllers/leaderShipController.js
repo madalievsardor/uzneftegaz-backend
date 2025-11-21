@@ -19,27 +19,24 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: "Barcha majburiy maydonlar to'ldirilishi kerak!" });
     }
 
-    let avatarUrl = "/assets/leader.png"; 
-    let public_id = null;
-
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "leaders", 
-        use_filename: true,
-        unique_filename: true,
-      });
-
-      avatarUrl = result.secure_url; 
-      public_id = result.public_id;  // Fayl identifikatori
+    if (!req.file) {
+      return res.status(400).json({ message: "Rahbarning rasmini joylash majburiy!" });
     }
+
+    // Cloudinary ga yuklash
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "leaders", 
+      use_filename: true,
+      unique_filename: true,
+    });
 
     const newLeader = new leaderShipModel({
       fullName: { uz: fullName_uz, ru: fullName_ru || "", oz: fullName_oz || "" },
       grade: { uz: grade_uz, ru: grade_ru || "", oz: grade_oz || "" },
       phone,
       email,
-      avatar: avatarUrl,
-      avatarPublicId: public_id, // public_id ni saqlash tavsiya qilinadi
+      avatar: result.secure_url,
+      avatarPublicId: result.public_id,
       workDays: { uz: workDays_uz, ru: workDays_ru || "", oz: workDays_oz || "" },
       workHours: { start: workHours_start, end: workHours_end },
       description: { uz: description_uz || "", ru: description_ru || "", oz: description_oz || "" },
@@ -53,6 +50,7 @@ exports.create = async (req, res) => {
     res.status(500).json({ message: "Server xatosi", error: err.message });
   }
 };
+
 
 exports.update = async (req, res) => {
   try {

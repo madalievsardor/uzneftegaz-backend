@@ -26,14 +26,10 @@ const leaderShipSchema = new mongoose.Schema({
         start: {
             type: String,
             required: true,
-            match: /^([0-1]\d|2[0-3]):([0-5]\d)$/,
-            example: "09:00"
         },
         end: {
             type: String,
             required: true,
-            match: /^([0-1]\d|2[0-3]):([0-5]\d)$/,
-            example: "18:00"
         }
     },
     description: {
