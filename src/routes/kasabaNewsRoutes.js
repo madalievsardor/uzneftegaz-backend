@@ -23,7 +23,7 @@ const { verifyToken } = require("../middleware/authMiddleware")
  *           schema:
  *             type: object
  *             properties:
- *               files:
+ *               media:
  *                 type: array
  *                 items:
  *                   type: string
@@ -48,7 +48,7 @@ const { verifyToken } = require("../middleware/authMiddleware")
  *         description: Yangilik yaratildi
  */
 router.post("/create", verifyToken, (req, res, next) => {
-    upload.array("files", 10) (req, res, (err) => {
+    upload.array("media", 10) (req, res, (err) => {
         if(err) {
             return res.status(400).json({message: err.message})
         }
@@ -92,7 +92,7 @@ router.get("/", kasabaNewsController.getAll);
  *           schema:
  *             type: object
  *             properties:
- *               files:
+ *               media:
  *                 type: array
  *                 items:
  *                   type: string
@@ -115,7 +115,7 @@ router.get("/", kasabaNewsController.getAll);
  *         description: Yangilandi
  */
 router.put("/:id", verifyToken, (req, res, next) => {
-    upload.array("files", 10) (req, res, (err) => {
+    upload.array("media", 10) (req, res, (err) => {
         if(err) {
             return res.status(400).json({message: err.message});
         };
