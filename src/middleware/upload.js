@@ -60,7 +60,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 150 * 1024 * 1024 },
+  limits: { fileSize: 250 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (ALLOWED_MIME_TYPES.includes(file.mimetype)) cb(null, true);
     else cb(new Error("Faqat rasm yoki video yuklash mumkin!"));
