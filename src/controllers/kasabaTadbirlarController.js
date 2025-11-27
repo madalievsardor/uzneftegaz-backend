@@ -177,7 +177,7 @@ exports.remove = async (req, res) => {
             resource_type: media.type === "video" ? "video" : "image",
           });
         } catch (err) {
-          console.warn(`Cloudinary o‘chirish xatosi: ${media.public_id}`);
+          console.warn(`Rasim o'chirishda xatolik: ${media.public_id}`);
         }
       }
     }

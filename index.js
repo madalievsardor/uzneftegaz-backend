@@ -28,6 +28,7 @@ const teamRoutes = require("./src/routes/teamRoutes");
 const kasabaDocumentRoutes = require("./src/routes/kasabaDocumentRoutes")
 const kasabaNewsRoutes = require("./src/routes/kasabaNewsRoutes")
 const kasabaTadbirlarRoutes = require("./src/routes/kasabaTadbirlarRoutes")
+const kasabaXodimlarRoutes = require("./src/routes/kasabaXodimlarRoutes")
 
 const connectDB = require("./src/config/db");
 const { swaggerUi, swaggerSpec } = require("./src/config/swagger");
@@ -84,6 +85,7 @@ app.use("/api/team", teamRoutes);
 app.use("/api/kasabaDocuments", kasabaDocumentRoutes)
 app.use("/api/kasabaNews", kasabaNewsRoutes)
 app.use("/api/tadbirlar", kasabaTadbirlarRoutes)
+app.use("/api/kasabaXodimlar", kasabaXodimlarRoutes)
 
 // Statik fayllar
 app.use("/uploads/banners", express.static(path.join(__dirname, "src", "uploads", "banners")));

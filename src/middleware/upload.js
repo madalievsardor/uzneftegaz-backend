@@ -36,6 +36,7 @@ const storage = new CloudinaryStorage({
     else if (req.baseUrl.includes("/kasabaDocuments")) folder = "kasabaDocuments"
     else if (req.baseUrl.includes("/kasabaNews")) folder = "kasabaNews"
     else if (req.baseUrl.includes("/tadbirlar")) folder = "tadbirlar"
+    else if (req.baseUrl.includes("/kasabaXodimlar")) folder = "kasabaXodimlar"
 
     const fileNameWithoutExt = path
       .parse(file.originalname)
