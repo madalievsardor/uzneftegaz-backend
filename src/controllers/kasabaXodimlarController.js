@@ -62,16 +62,18 @@ exports.create = async (req, res) => {
                 ru: category_ru,
                 oz: category_oz
             },
-            gifts: {
-                uz: category_uz,
-                ru: category_ru,
-                oz: category_oz
-            },
+            gifts: [
+                {
+                    uz: gifts_uz,
+                    ru: gifts_ru,
+                    oz: gifts_oz
+                }
+            ],
             mediaType
         });
 
         await xodim.save();
-        res.status(201).json({ message: "Ma'lumot muvaffaqiyatli qo'shildi!", xodim})
+        res.status(201).json({ message: "Ma'lumot muvaffaqiyatli qo'shildi!", xodim })
     } catch (e) {
         res.status(500).json({ message: "Serverda xatolik", error: e.message })
     }
@@ -94,8 +96,8 @@ exports.update = async (req, res) => {
             return res.status(400).json({ message: "Noto'g'ri ID format" })
         }
         const xodim = await kasabaXodimlarModel.findById(id)
-        if(!xodim) {
-            return res.status(404).json({message: "Ma'lumot topilmadi!"})
+        if (!xodim) {
+            return res.status(404).json({ message: "Ma'lumot topilmadi!" })
         }
         const {
             title_uz,
@@ -111,14 +113,14 @@ exports.update = async (req, res) => {
             gifts_ru,
             gifts_oz,
         } = req.body;
-        
-        if(req.files && req.files.length > 0 && xodim.mediaType.length > 0) {
-            for(const media of xodim.mediaType) {
-                try{
+
+        if (req.files && req.files.length > 0 && xodim.mediaType.length > 0) {
+            for (const media of xodim.mediaType) {
+                try {
                     await cloudinary.uploader.destroy(media.public_id, {
                         resource_type: media.type === "video" ? "video" : "image",
                     });
-                }catch(err) {
+                } catch (err) {
                     console.warn(`Eski faylni o'chirishda xatolik: ${media.public_id}`)
                 }
             }
@@ -141,43 +143,49 @@ exports.update = async (req, res) => {
         xodim.category.ru = category_ru || xodim.category.ru;
         xodim.category.oz = category_oz || xodim.category.oz;
 
-        xodim.gifts.uz = gifts_uz || xodim.gifts.uz;
-        xodim.gifts.ru = gifts_ru || xodim.gifts.ru;
-        xodim.gifts.oz = gifts_oz || xodim.gifts.oz;
+        if (gifts_uz && gifts_ru && gifts_oz) {
+            xodim.gifts = [
+                {
+                    uz: gifts_uz,
+                    ru: gifts_ru,
+                    oz: gifts_oz
+                }
+            ];
+        }
 
         await xodim.save();
-        res.status(200).json({message: "Tadbir muvaffaqiyatli yangilandi", xodim})
+        res.status(200).json({ message: "Tadbir muvaffaqiyatli yangilandi", xodim })
     } catch (e) {
         res.status(500).json({ message: "Serverda xatolik", error: e.message })
     }
 }
 exports.remove = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
 
-        if(!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({message: "Noto'g'ri ID format!"})
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Noto'g'ri ID format!" })
         }
 
         const xodim = await kasabaXodimlarModel.findById(id);
-        if(!xodim) {
-            return res.status(404).json({message: "Ma'lumot topilmadi!"})
+        if (!xodim) {
+            return res.status(404).json({ message: "Ma'lumot topilmadi!" })
         }
 
-            if (xodim.mediaType && xodim.mediaType.length > 0) {
-              for (const media of xodim.mediaType) {
+        if (xodim.mediaType && xodim.mediaType.length > 0) {
+            for (const media of xodim.mediaType) {
                 try {
-                  await cloudinary.uploader.destroy(media.public_id, {
-                    resource_type: media.type === "video" ? "video" : "image",
-                  });
+                    await cloudinary.uploader.destroy(media.public_id, {
+                        resource_type: media.type === "video" ? "video" : "image",
+                    });
                 } catch (err) {
-                  console.warn(`Rasim o'chirishda xatolik: ${media.public_id}`);
+                    console.warn(`Rasim o'chirishda xatolik: ${media.public_id}`);
                 }
-              }
             }
-        
-            await kasabaXodimlarModel.findByIdAndDelete(id);
-            res.status(200).json({message: "Ma'lumot muvaffaqiyatli o'chirildi!"})
+        }
+
+        await kasabaXodimlarModel.findByIdAndDelete(id);
+        res.status(200).json({ message: "Ma'lumot muvaffaqiyatli o'chirildi!" })
     } catch (e) {
         res.status(500).json({ message: "Serverda xatolik", error: e.message })
     }
