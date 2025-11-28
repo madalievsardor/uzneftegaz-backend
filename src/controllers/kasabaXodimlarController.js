@@ -30,14 +30,31 @@ exports.create = async (req, res) => {
         if (!category_uz.trim()) missingFields.push("category_uz");
         if (!category_ru.trim()) missingFields.push("category_ru");
         if (!category_oz.trim()) missingFields.push("category_oz");
-        if (!gifts_uz.trim()) missingFields.push("gifts_uz");
-        if (!gifts_ru.trim()) missingFields.push("gifts_ru");
-        if (!gifts_oz.trim()) missingFields.push("gifts_oz");
+        if (!gifts_uz || (Array.isArray(gifts_uz) && gifts_uz.length === 0) || (!Array.isArray(gifts_uz) && !gifts_uz.trim())) {
+            missingFields.push("gifts_uz");
+        }
 
         if (missingFields.length > 0) {
             return res.status(400).json({ message: `Quyidagi ${missingFields} to'ldirilmagan!` })
         }
 
+        const gifts = [];
+
+        if (Array.isArray(gifts_uz)) {
+            for (let i = 0; i < gifts_uz.length; i++) {
+                gifts.push({
+                    uz: gifts_uz[i],
+                    ru: gifts_ru[i],
+                    oz: gifts_oz[i]
+                });
+            }
+        } else {
+            gifts.push({
+                uz: gifts_uz,
+                ru: gifts_ru,
+                oz: gifts_oz
+            });
+        }
         let mediaType = [];
 
         if (req.files && req.files.length > 0) {
@@ -62,13 +79,7 @@ exports.create = async (req, res) => {
                 ru: category_ru,
                 oz: category_oz
             },
-            gifts: [
-                {
-                    uz: gifts_uz,
-                    ru: gifts_ru,
-                    oz: gifts_oz
-                }
-            ],
+            gifts,
             mediaType
         });
 
@@ -132,8 +143,8 @@ exports.update = async (req, res) => {
         }
 
         xodim.title.uz = title_uz || xodim.title.uz;
-        xodim.title_ru = title_ru || xodim.title.ru;
-        xodim.title_oz = title_oz || xodim.title.oz;
+        xodim.title.ru = title_ru || xodim.title.ru;
+        xodim.title.oz = title_oz || xodim.title.oz;
 
         xodim.description.uz = description_uz || xodim.description.uz;
         xodim.description.ru = description_ru || xodim.description.ru;
@@ -144,13 +155,23 @@ exports.update = async (req, res) => {
         xodim.category.oz = category_oz || xodim.category.oz;
 
         if (gifts_uz && gifts_ru && gifts_oz) {
-            xodim.gifts = [
-                {
+            const gifts = [];
+            if (Array.isArray(gifts_uz)) {
+                for (let i = 0; i < gifts_uz.length; i++) {
+                    gifts.push({
+                        uz: gifts_uz[i],
+                        ru: gifts_ru[i],
+                        oz: gifts_oz[i],
+                    });
+                }
+            } else {
+                gifts.push({
                     uz: gifts_uz,
                     ru: gifts_ru,
-                    oz: gifts_oz
-                }
-            ];
+                    oz: gifts_oz,
+                });
+            }
+            xodim.gifts = gifts;
         }
 
         await xodim.save();
@@ -159,6 +180,24 @@ exports.update = async (req, res) => {
         res.status(500).json({ message: "Serverda xatolik", error: e.message })
     }
 }
+
+exports.clearAllGifts = async (req, res) => {
+  try {
+    // Barcha xodimlarni yangilash
+    const result = await kasabaXodimlarModel.updateMany(
+      {},            // shart: hamma
+      { $set: { gifts: [] } } // gifts array ni bo'shatish
+    );
+
+    res.status(200).json({
+      message: "Barcha xodimlardagi gifts o'chirildi",
+      modifiedCount: result.modifiedCount
+    });
+  } catch (e) {
+    console.error("SERVER ERROR:", e);
+    res.status(500).json({ message: "Serverda xatolik", error: e.message });
+  }
+};
 exports.remove = async (req, res) => {
     try {
         const { id } = req.params;

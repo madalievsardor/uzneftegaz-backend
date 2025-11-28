@@ -46,12 +46,17 @@ const { verifyToken } = require("../middleware/authMiddleware")
  *       201:
  *         description: Ma’lumot qo‘shildi
  */
-router.post("/create", verifyToken, (req, res, next) => {
-    upload.array("media", 10)(req, res, (err) => {
-        if (err) return res.status(400).json({ message: err.message });
-        next();
-    });
-}, kasaba.create);
+router.post(
+    "/create",
+    verifyToken,
+    (req, res, next) => {
+        upload.array("media", 10)(req, res, (err) => {
+            if (err) return res.status(400).json({ message: err.message });
+            next();
+        });
+    },
+    kasaba.create
+);
 
 
 /**
@@ -109,13 +114,29 @@ router.get("/", kasaba.getAll);
  *       200:
  *         description: Yangilandi
  */
-router.put("/:id", verifyToken, (req, res, next) => {
-    upload.array("media", 10)(req, res, (err) => {
-        if (err) return res.status(400).json({ message: err.message });
-        next();
-    });
-}, kasaba.update);
+router.put(
+    "/:id",
+    verifyToken,
+    (req, res, next) => {
+        upload.array("media", 10)(req, res, (err) => {
+            if (err) return res.status(400).json({ message: err.message });
+            next();
+        });
+    },
+    kasaba.update
+);
 
+/**
+ * @swagger
+ * /kasabaXodimlar/clear-all-gifts:
+ *   delete:
+ *     summary: Barcha xodimlardagi giftslarni o‘chirish
+ *     tags: [Kasaba Xodimlari]
+ *     responses:
+ *       200:
+ *         description: Barcha giftslar o'chirildi
+ */
+router.delete("/clear-all-gifts", verifyToken, kasaba.clearAllGifts);
 
 /**
  * @swagger
