@@ -29,7 +29,8 @@ const kasabaDocumentRoutes = require("./src/routes/kasabaDocumentRoutes")
 const kasabaNewsRoutes = require("./src/routes/kasabaNewsRoutes")
 const kasabaTadbirlarRoutes = require("./src/routes/kasabaTadbirlarRoutes")
 const kasabaXodimlarRoutes = require("./src/routes/kasabaXodimlarRoutes")
-
+const oavNewsRoutes = require("./src/routes/oavNewsRoutes");
+const booksRoutes = require("./src/routes/booksRoutes")
 const connectDB = require("./src/config/db");
 const { swaggerUi, swaggerSpec } = require("./src/config/swagger");
 
@@ -86,7 +87,8 @@ app.use("/api/kasabaDocuments", kasabaDocumentRoutes)
 app.use("/api/kasabaNews", kasabaNewsRoutes)
 app.use("/api/tadbirlar", kasabaTadbirlarRoutes)
 app.use("/api/kasabaXodimlar", kasabaXodimlarRoutes)
-
+app.use("/api/oavNews", oavNewsRoutes)
+app.use("/api/books", booksRoutes)
 // Statik fayllar
 app.use("/uploads/banners", express.static(path.join(__dirname, "src", "uploads", "banners")));
 app.use("/uploads/files", express.static(path.join(__dirname, "src", "uploads", "files")));
