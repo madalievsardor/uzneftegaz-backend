@@ -18,26 +18,8 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: "Sarlavha (Uz) majburiy maydon" });
     }
 
-    const maxLength = 200;
-    const maxDescLength = 350
-    if (
-      title_uz.length > maxLength ||
-      (title_ru && title_ru.length > maxLength) ||
-      (title_oz && title_oz.length > maxLength)
-    ) {
-      return res.status(400).json({
-        message: `Sarlavha uzunligi ${maxLength} belgidan oshmasligi kerak`,
-      });
-    }
-    if (
-      desc_uz.length > maxDescLength || desc_ru.length > maxDescLength || desc_oz > maxDescLength
-    ) {
-      return res.status(400).json({
-        message: `Tavsif uzunligi ${maxDescLength} belgidan oshmasligi kerak`
-      })
-    }
 
-      const mediaType = req.file.mimetype.startsWith("image") ? "image" : "video";
+    const mediaType = req.file.mimetype.startsWith("image") ? "image" : "video";
 
     const newBanner = new bannerModel({
       file: req.file.path,
