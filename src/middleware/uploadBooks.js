@@ -57,7 +57,7 @@ const uploadBooks = multer({
     }
   }
 }).fields([
-  { name: "mediaImages", maxCount: 10 },
+  { name: "mediaType", maxCount: 10 },
   { name: "mediaDocs", maxCount: 10 }
 ]);
 

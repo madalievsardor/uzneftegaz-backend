@@ -30,7 +30,7 @@ const uploadBooks = require("../middleware/uploadBooks"); // rasm/video
  *               description_oz: { type: string }
  *               pages: { type: number }
  *               year: { type: number }
- *               mediaImages:
+ *               mediaType:
  *                 type: array
  *                 items:
  *                   type: string
@@ -45,14 +45,12 @@ const uploadBooks = require("../middleware/uploadBooks"); // rasm/video
  *         description: Kitob muvaffaqiyatli yaratildi
  */
 router.post("/create", (req, res, next) => {
-  uploadBooks(req, res, (err) => {
-    if (err) return res.status(400).json({ message: err.message });
-
-    req.filesImage = req.files?.mediaImages || [];
-    req.filesDocument = req.files?.mediaDocs || [];
-    next();
-  });
+    uploadBooks(req, res, (err) => {
+        if (err) return res.status(400).json({ message: err.message });
+        next();
+    });
 }, booksController.create);
+
 
 
 // ================= GET ALL =================
@@ -101,7 +99,7 @@ router.get("/", booksController.getAll);
  *               description_oz: { type: string }
  *               pages: { type: number }
  *               year: { type: number }
- *               mediaImages:
+ *               mediaType:
  *                 type: array
  *                 items:
  *                   type: string
