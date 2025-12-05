@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const booksController = require("../controllers/booksController");
 const uploadBooks = require("../middleware/uploadBooks"); // rasm/video
-
+const { verifyToken } = require("../middleware/authMiddleware")
 // ================= CREATE =================
 /**
  * @swagger
@@ -30,26 +30,25 @@ const uploadBooks = require("../middleware/uploadBooks"); // rasm/video
  *               description_oz: { type: string }
  *               pages: { type: number }
  *               year: { type: number }
+
  *               mediaType:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
+ *                 type: string
+ *                 format: binary  
+
  *               mediaDocs:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
+ *                 type: string
+ *                 format: binary  
  *     responses:
  *       201:
  *         description: Kitob muvaffaqiyatli yaratildi
  */
-router.post("/create", (req, res, next) => {
+router.post("/create", verifyToken, (req, res, next) => {
     uploadBooks(req, res, (err) => {
         if (err) return res.status(400).json({ message: err.message });
         next();
     });
 }, booksController.create);
+
 
 
 
@@ -99,30 +98,27 @@ router.get("/", booksController.getAll);
  *               description_oz: { type: string }
  *               pages: { type: number }
  *               year: { type: number }
+
  *               mediaType:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
+ *                 type: string
+ *                 format: binary     # ❗ SINGLE IMAGE
+
  *               mediaDocs:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
+ *                 type: string
+ *                 format: binary     # ❗ SINGLE DOCUMENT
+
  *     responses:
  *       200:
  *         description: Kitob muvaffaqiyatli yangilandi
  */
-router.put("/:id", (req, res, next) => {
+router.put("/:id", verifyToken, (req, res, next) => {
     uploadBooks(req, res, (err) => {
         if (err) return res.status(400).json({ message: err.message });
 
-        // Controllerga moslab fayllarni beramiz
-        req.filesImage = req.files?.mediaImages || [];
-        req.filesDocument = req.files?.mediaDocs || [];
         next();
     });
 }, booksController.update);
+
 
 // ================= DELETE =================
 /**
@@ -142,6 +138,6 @@ router.put("/:id", (req, res, next) => {
  *       200:
  *         description: Kitob muvaffaqiyatli o'chirildi
  */
-router.delete("/:id", booksController.remove);
+router.delete("/:id", verifyToken, booksController.remove);
 
 module.exports = router;

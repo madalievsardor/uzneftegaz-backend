@@ -29,8 +29,8 @@ exports.create = async (req, res) => {
         if (!avtor_uz?.trim()) missingFields.push("avtor_uz");
         if (!avtor_ru?.trim()) missingFields.push("avtor_ru");
         if (!avtor_oz?.trim()) missingFields.push("avtor_oz");
-        if (!pages?.trim()) missingFields.push("pages");
-        if (!year?.trim()) missingFields.push("year");
+        if (!pages) missingFields.push("pages");
+        if (!year) missingFields.push("year");
 
         if (missingFields.length > 0) {
             return res.status(400).json({
@@ -38,27 +38,26 @@ exports.create = async (req, res) => {
             });
         }
 
-        // 📌 Rasmlar (multer: mediaImages)
-        const mediaType = [];
-        if (req.files?.mediaType) {
-            req.files.mediaType.forEach(file => {
-                mediaType.push({
-                    url: file.path,
-                    public_id: file.filename
-                });
-            });
+        // 📌 Rasmlar (single object)
+        let mediaType = null;
+        if (req.files?.mediaType?.[0]) {
+            const file = req.files.mediaType[0];
+            mediaType = {
+                url: file.path,
+                public_id: file.filename,
+                type: file.mimetype
+            };
         }
 
-        // 📌 Hujjatlar (multer: mediaDocs)
-        const mediaDocs = [];
-        if (req.files?.mediaDocs) {
-            req.files.mediaDocs.forEach(file => {
-                mediaDocs.push({
-                    url: file.path,
-                    public_id: file.filename,
-                    format: file.mimetype
-                });
-            });
+        // 📄 Hujjatlar (single object)
+        let mediaDocs = null;
+        if (req.files?.mediaDocs?.[0]) {
+            const file = req.files.mediaDocs[0];
+            mediaDocs = {
+                url: file.path,
+                public_id: file.filename,
+                format: file.mimetype
+            };
         }
 
         const book = new booksSchema({
@@ -67,8 +66,8 @@ exports.create = async (req, res) => {
             description: { uz: description_uz, ru: description_ru, oz: description_oz },
             pages,
             year,
-            mediaType,  // RASMLAR
-            mediaDocs   // HUJJATLAR
+            mediaType, // SINGLE OBJECT
+            mediaDocs  // SINGLE OBJECT
         });
 
         await book.save();
@@ -82,6 +81,7 @@ exports.create = async (req, res) => {
         });
     }
 };
+
 
 
 exports.getAll = async (req, res) => {
@@ -111,77 +111,46 @@ exports.update = async (req, res) => {
             pages, year
         } = req.body;
 
-        // ============================
-        // 📌 FAYLLAR
-        // ============================
-        const newImages = req.files?.mediaType || [];
-        const newDocs = req.files?.mediaDocs || [];
+        // =======================================================
+        // 📁 Yangi yuklangan fayllar
+        // SINGLE FILE → [0]
+        // =======================================================
+        const newImage = req.files?.mediaType?.[0] || null;
+        const newDoc = req.files?.mediaDocs?.[0] || null;
 
-        const isNewMediaUploaded = newImages.length > 0 || newDocs.length > 0;
-
-        if (isNewMediaUploaded) {
-
-            // ============================
-            // 📌 ESKI RASMLAR (mediaType) O‘CHIRISH
-            // ============================
-            if (book.mediaType.length > 0) {
-                for (const media of book.mediaType) {
-                    try {
-                        await cloudinary.uploader.destroy(media.public_id, {
-                            resource_type: "image"
-                        });
-                    } catch (err) {
-                        console.warn("Eski rasm o‘chirishda xatolik:", media.public_id);
-                    }
-                }
+        // ===========================
+        // 📸 RASM YANGILASH
+        // ===========================
+        if (newImage) {
+            // eski rasmni o'chirish
+            if (book.mediaType && book.mediaType.public_id) {
+                await cloudinary.uploader.destroy(book.mediaType.public_id, { resource_type: "image" });
             }
-
-            // ============================
-            // 📌 ESKI DOCS (mediaDocs) O‘CHIRISH
-            // ============================
-            if (book.mediaDocs.length > 0) {
-                for (const doc of book.mediaDocs) {
-                    try {
-                        await cloudinary.uploader.destroy(doc.public_id, {
-                            resource_type: "raw"
-                        });
-                    } catch (err) {
-                        console.warn("Eski hujjat o‘chirishda xatolik:", doc.public_id);
-                    }
-                }
-            }
-
-            // ============================
-            // 📸 YANGI RASMLARNI SAQLASH
-            // ============================
-            const mediaType = [];
-            newImages.forEach(file => {
-                mediaType.push({
-                    url: file.path,
-                    public_id: file.filename
-                });
-            });
-
-            // ============================
-            // 📄 YANGI DOCS NI SAQLASH
-            // ============================
-            const mediaDocs = [];
-            newDocs.forEach(file => {
-                mediaDocs.push({
-                    url: file.path,
-                    public_id: file.filename,
-                    format: file.mimetype
-                });
-            });
-
-            // DBga yozamiz
-            book.mediaType = mediaType;
-            book.mediaDocs = mediaDocs;
+            // yangi rasmni saqlash
+            book.mediaType = {
+                url: newImage.path,
+                public_id: newImage.filename,
+                type: newImage.mimetype
+            };
         }
 
-        // ============================
+        if (newDoc) {
+            // eski docni o'chirish
+            if (book.mediaDocs && book.mediaDocs.public_id) {
+                await cloudinary.uploader.destroy(book.mediaDocs.public_id, { resource_type: "raw" });
+            }
+            // yangi docni saqlash
+            book.mediaDocs = {
+                url: newDoc.path,
+                public_id: newDoc.filename,
+                format: newDoc.mimetype
+            };
+        }
+
+
+        // ===========================
         // 📌 MATN MAYDONLARNI YANGILASH
-        // ============================
+        // ===========================
         book.title.uz = title_uz || book.title.uz;
         book.title.ru = title_ru || book.title.ru;
         book.title.oz = title_oz || book.title.oz;
