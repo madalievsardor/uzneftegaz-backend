@@ -44,11 +44,11 @@ const storage = new CloudinaryStorage({
 
     return {
       folder: folderName,
-      resource_type: "raw", // ⚠️ Muhim! Hujjatlar uchun 'raw' bo'lishi kerak
-      public_id: `${Date.now()}-${path.parse(file.originalname).name}`,
-      format: path.extname(file.originalname).substring(1), // fayl kengaytmasi
-      use_filename: true,
-      unique_filename: false,
+      resource_type: "raw",       // muhim! PDF, DOCX, ZIP uchun
+      access_mode: "public",      // muhim! Omma uchun
+      public_id: `${Date.now()}-${path.parse(file.originalname).name.replace(/\s+/g, "_")}`,
+      use_filename: false,
+      unique_filename: true,
     };
   },
 });
